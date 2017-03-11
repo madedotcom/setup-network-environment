@@ -63,13 +63,15 @@ func writeEnvironment(w io.Writer) error {
 			return err
 		}
 		for _, addr := range addrs {
-			ip, _, err := net.ParseCIDR(addr.String())
+			ip, net, err := net.ParseCIDR(addr.String())
 			// Record IPv4 network settings. Stop at the first IPv4 address
 			// found for the interface.
 			if err == nil && ip.To4() != nil {
 				buffer.WriteString(fmt.Sprintf("%s_IPV4=%s\n", strings.Replace(strings.ToUpper(iface.Name), ".", "_", -1), ip.String()))
+				buffer.WriteString(fmt.Sprintf("%s_NET=%s\n", strings.Replace(strings.ToUpper(iface.Name), ".", "_", -1), net.String()))
 				if defaultIfaceName == iface.Name {
 					buffer.WriteString(fmt.Sprintf("DEFAULT_IPV4=%s\n", ip.String()))
+					buffer.WriteString(fmt.Sprintf("DEFAULT_NET=%s\n", net.String()))
 				}
 				break
 			}
